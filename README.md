@@ -1,4 +1,4 @@
-# Arvato-Customer-Segmentation
+# Arvato Customer Segmentation
 
 ## Customer Segmentation Report
 
@@ -13,3 +13,7 @@ You'll have access to a third dataset with attributes from targets of a mail ord
 Once you've chosen a model, you'll use it to make predictions on the campaign data as part of a Kaggle Competition. You'll rank the individuals by how likely they are to convert to being a customer, and see how your modeling skills measure up against your fellow students.
 
 [Machine Learning Capstone project rubric](https://review.udacity.com/#!/rubrics/410/view)
+
+# TODO List
+
+- [Documentation](https://medium.com/@richdayandnight/a-simple-tutorial-on-how-to-document-your-python-project-using-sphinx-and-rinohtype-177c22a15b5b)

@@ -14,4 +14,3 @@ profile:
 
 	rm data/demographic_data_customers_temp.csv
 	rm data/demographic_data_german_population_temp.csv
-

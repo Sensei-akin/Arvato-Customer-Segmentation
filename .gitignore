@@ -1,3 +1,7 @@
 .idea
 data
 reports
+notebooks/.ipynb_checkpoints
+notebooks/catboost_info
+submissions
+*.py[cod]
