@@ -1,3 +1,13 @@
-kaggle==1.5.6
-pandas==0.25.3
+yellowbrick==1.1
+scikit_lego==0.3.4
+shap==0.35.0
+eli5==0.10.1
+catboost==0.22
 numpy==1.18.1
+plotly==4.6.0
+missingno==0.4.2
+pandas==0.25.3
+plotly_express==0.4.1
+kaggle==1.5.6
+scikit_learn==0.22.2.post1
+sklego==0.0

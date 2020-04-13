@@ -6,6 +6,6 @@ with open('requirements.txt') as f:
 
 setup(
     name='Arvato Customer Segmentation',
-    version='0.1',
+    version='0.2',
     install_requires=requirements
 )

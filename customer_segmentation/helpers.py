@@ -2,10 +2,11 @@ import pandas as pd
 import numpy as np
 import random
 
-from typing import Dict
+from typing import Dict, Set, Any
 from kaggle.api.kaggle_api_extended import KaggleApi
+from joblib import dump, load
 
-from .constants import PATH_DATA, PATH_FILE_ATTRIBUTES, PATH_SUBMISSIONS, SEP, NA_VALUES
+from .constants import PATH_DATA, PATH_FILE_ATTRIBUTES, PATH_SUBMISSIONS, SEP, NA_VALUES, RANDOM_STATE, PATH_OBJECTS
 
 
 def read_attributes() -> pd.DataFrame:
@@ -48,11 +49,22 @@ def read_demographic_data(filename: str, sample_ratio: float = 1.0) -> pd.DataFr
         """Inner function to read the data in a sampled way"""
         return index > 0 and random.random() > sample_ratio
 
+    # RANDOM_STATE is necessary for easy reproducibility of sampled data
+    random.seed(RANDOM_STATE)
+
     return pd.read_csv(PATH_DATA / filename,
                        sep=SEP,
                        dtype=dtype,
                        na_values=NA_VALUES,
                        skiprows=None if sample_ratio == 1 else skiprows_sample)
+
+
+def constant_columns(df: pd.DataFrame) -> Set[str]:
+    """Gives the constants columns of `df` dataframe
+    """
+    df_dropped_constants = df.loc[:, (df != df.iloc[0]).any()]
+
+    return set(df.columns).difference(df_dropped_constants.columns)
 
 
 def nullity_pct(df: pd.DataFrame) -> pd.Series:
@@ -61,7 +73,8 @@ def nullity_pct(df: pd.DataFrame) -> pd.Series:
     return df.isnull().mean()
 
 
-def kaggle_submission(column_lnr: pd.Series, y_pred: np.array, submission_filename: str) -> None:
+def kaggle_submission(column_lnr: pd.Series, y_pred: np.array,
+                      submission_filename: str, submission_message: str) -> None:
     """Submits and saves submission data provided in `column_lrt` and
     `y_pred`
     """
@@ -74,5 +87,17 @@ def kaggle_submission(column_lnr: pd.Series, y_pred: np.array, submission_filena
     kaggle_api.authenticate()
 
     print(kaggle_api.competition_submit(filepath,
-                                        message=submission_filename,
+                                        message=submission_message,
                                         competition='udacity-arvato-identify-customers'))
+
+
+def serialize_object_dump(object_: Any, filename: str) -> None:
+    """Dumps `object` in `PATH_OBJECTS / filename`
+    """
+    dump(object_, PATH_OBJECTS / filename)
+
+
+def serialize_object_load(filename: str) -> Any:
+    """Loads serialized object in `PATH_OBJECTS / filename`
+    """
+    return load(PATH_OBJECTS / filename)

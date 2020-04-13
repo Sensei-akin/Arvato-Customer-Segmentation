@@ -3,5 +3,8 @@ data
 reports
 notebooks/.ipynb_checkpoints
 notebooks/catboost_info
+notebooks/cb_model.json
+models
 submissions
+objects
 *.py[cod]
