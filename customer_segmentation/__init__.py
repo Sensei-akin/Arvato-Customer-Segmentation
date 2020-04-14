@@ -13,3 +13,5 @@ from .models import (cat_features_fillna,
                      load_catboost_model,
                      save_pipeline,
                      load_pipeline)
+from .experiment_tracking import (new_experiment,
+                                  new_run)
