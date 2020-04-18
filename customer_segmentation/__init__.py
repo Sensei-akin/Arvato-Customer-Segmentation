@@ -14,4 +14,7 @@ from .models import (cat_features_fillna,
                      save_pipeline,
                      load_pipeline)
 from .experiment_tracking import (new_experiment,
-                                  new_run)
+                                  new_run,
+                                  apply_runs_to_experiment,
+                                  n_best_models_from_experiments,
+                                  load_trained_model)

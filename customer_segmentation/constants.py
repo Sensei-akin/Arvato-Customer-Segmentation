@@ -8,6 +8,7 @@ PATH_FILE_ATTRIBUTES = PATH_DATA / 'feature_attributes.xlsx'
 PATH_MODELS = PATH_PROJECT / 'models'
 PATH_SUBMISSIONS = PATH_PROJECT / 'submissions'
 PATH_OBJECTS = PATH_PROJECT / 'objects'
+PATH_MLFLOW_TRACKING = PATH_PROJECT / 'mlruns'
 SEP = ';'
 NA_VALUES = [0, -1, 'X', 'XX']
 RANDOM_STATE = 42

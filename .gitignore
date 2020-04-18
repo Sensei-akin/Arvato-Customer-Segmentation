@@ -6,5 +6,7 @@ notebooks/catboost_info
 notebooks/cb_model.json
 models
 submissions
+mlruns
 objects
+.pytest_cache
 *.py[cod]

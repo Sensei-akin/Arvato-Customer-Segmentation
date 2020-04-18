@@ -3,6 +3,11 @@
 install:
 	pip install .
 
+.PHONY: test
+
+test:
+	pytest --pyargs customer_segmentation
+
 .PHONY: profile
 
 profile:
@@ -14,3 +19,6 @@ profile:
 
 	rm data/demographic_data_customers_temp.csv
 	rm data/demographic_data_german_population_temp.csv
+
+proposal.pdf:
+	rst2pdf --stylesheets=twelvepoint proposal.rst proposal.pdf

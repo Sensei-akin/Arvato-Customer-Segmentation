@@ -16,6 +16,23 @@ Labels = namedtuple('Labels', 'y_train y_test y_valid')
 Metrics = namedtuple('Metrics', 'ACC AUC')
 
 
+class DataSplitsUnitException(Exception):
+    """Custom exception to make
+    `sklearn.model_selection.train_test_split`
+    only works with the float unit
+    """
+    pass
+
+
+class DataSplitsSizeException(Exception):
+    """Customized exception just to clarify "ValueError"
+    from `sklearn.model_selection.train_test_split`
+    behavior when the test or validation size is not correct
+    and none is equal to zero
+    """
+    pass
+
+
 def cat_features_fillna(df: pd.DataFrame, cat_features: List[str]) -> pd.DataFrame:
     """Fills NA values for each column in `cat_features` for
     `df` dataframe
@@ -34,30 +51,69 @@ def cat_features_fillna(df: pd.DataFrame, cat_features: List[str]) -> pd.DataFra
 
 def preprocessing_baseline(df: pd.DataFrame,
                            cat_features: List[str],
-                           target: str) -> Tuple[Features, Labels]:
-    """Makes preprocessing tasks for baseline model with
-    data in `df` dataframe
+                           target: str,
+                           test_size: float = .15,
+                           valid_size: float = .15) -> Tuple[Features, Labels]:
+    """Creates `features` and `labels` splits and fill NA values
+     for categorical features passed in `cat_features` from data
+    in `df` dataframe
 
     Target feature must be provided in `target` arg
+
+    `test_size` and `valid_size` has to be greater than zero and
+    less too one, if it is 0 removes that split set
     """
+    if 0 < test_size >= 1 or 0 < valid_size >= 1:
+        raise DataSplitsUnitException(
+            'The parameters test_size and valid_size have to be greater than zero and less too one'
+        )
+
     X = df.drop(columns=target)
     y = df[target]
 
     X_filled = cat_features_fillna(X, cat_features=cat_features)
 
-    X_train, X_test_and_valid, y_train, y_test_and_valid = train_test_split(
-        X_filled, y, test_size=.3, random_state=RANDOM_STATE
-    )
+    try:
+        X_train, X_test_and_valid, y_train, y_test_and_valid = train_test_split(
+            X_filled, y, test_size=test_size + valid_size, random_state=RANDOM_STATE, stratify=y
+        )
 
-    X_test, X_valid, y_test, y_valid = train_test_split(
-        X_test_and_valid, y_test_and_valid, test_size=.5, random_state=RANDOM_STATE
-    )
+        X_test, X_valid, y_test, y_valid = (
+            train_test_split(X_test_and_valid,
+                             y_test_and_valid,
+                             test_size=valid_size / (test_size + valid_size),
+                             random_state=RANDOM_STATE,
+                             stratify=y_test_and_valid)
+        )
+    except ValueError as value_error:
+        if (test_size + valid_size) >= 1:
+            raise DataSplitsSizeException(
+                'The size of the test and validation data added together is greater than or equal to one'
+            ) from value_error
+        elif test_size == valid_size == 0:
+            X_train, y_train = X_filled.copy(), y.copy()
+            X_test, y_test = pd.DataFrame(), pd.Series()
+            X_valid, y_valid = pd.DataFrame(), pd.Series()
+        elif test_size == 0:
+            X_train, X_valid, y_train, y_valid = train_test_split(
+                X_filled, y, test_size=valid_size, random_state=RANDOM_STATE, stratify=y
+            )
+
+            X_test, y_test = pd.DataFrame(), pd.Series()
+        elif valid_size == 0:
+            X_train, X_test, y_train, y_test = train_test_split(
+                X_filled, y, test_size=test_size, random_state=RANDOM_STATE, stratify=y
+            )
+
+            X_valid, y_valid = pd.DataFrame(), pd.Series()
+        else:
+            raise value_error
 
     return (Features(X_train, X_test, X_valid),
             Labels(y_train, y_test, y_valid))
 
 
-def compute_metrics(model: CatBoostClassifier, X: pd.DataFrame, y: pd.Series) -> Metrics:
+def compute_metrics(model: Union[Pipeline, CatBoostClassifier], X: pd.DataFrame, y: pd.Series) -> Metrics:
     predict = model.predict(X)
     predict_proba = model.predict_proba(X)[:, 1]
 
@@ -67,23 +123,23 @@ def compute_metrics(model: CatBoostClassifier, X: pd.DataFrame, y: pd.Series) ->
     return Metrics(ACC=acc, AUC=auc)
 
 
-def show_metrics_baseline(model: CatBoostClassifier, features: Features, labels: Labels) -> None:
+def show_metrics_baseline(model: Union[Pipeline, CatBoostClassifier], features: Features, labels: Labels) -> None:
     """Giving `model`, `features` and `labels` show accuracy and AUC
     for training, testing and validation data
 
     Model passed in argument `model` has to be already fitted
     """
-    acc_train, auc_train = compute_metrics(model, X=features.X_train, y=labels.y_train)
-    acc_test, auc_test = compute_metrics(model, X=features.X_test, y=labels.y_test)
-    acc_valid, auc_valid = compute_metrics(model, X=features.X_valid, y=labels.y_valid)
+    split_names = [field.replace('X_', '').capitalize()
+                   for field in features._fields]
 
-    print(f'Accuracy Train: {acc_train}')
-    print(f'Accuracy Test: {acc_test}')
-    print(f'Accuracy Valid: {acc_valid}')
+    for split_name, split_features, split_labels in zip(split_names, features, labels):
+        if split_features.empty:
+            continue
 
-    print(f'AUC Train: {auc_train}')
-    print(f'AUC Test: {auc_test}')
-    print(f'AUC Valid: {auc_valid}')
+        split_acc, split_auc = compute_metrics(model, X=split_features, y=split_labels)
+
+        print(f'Accuracy {split_name}: {split_acc}')
+        print(f'AUC {split_name}: {split_auc}')
 
 
 def target_stats_by_feature(df: pd.DataFrame, feature: str,
