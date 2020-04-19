@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html >
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+      <title>Arvato Customer Segmentation Docs</title>
+    
+      <link rel="stylesheet" href="_static/pygments.css">
+      <link rel="stylesheet" href="_static/theme.css">
+      <link rel="stylesheet" href="_static/sphinx_press_theme.css">
+      
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+
+      <!-- sphinx script_files -->
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+
+      
+      <script src="_static/theme-vendors.js"></script>
+      <script src="_static/theme.js" defer></script>
+    
+  <link rel="index" title="Index" href="genindex.html" />
+  <link rel="search" title="Search" href="search.html" /> 
+  </head>
+
+  <body>
+    <div id="app" class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <router-link to="#" class="home-link">
+    
+      <span class="site-name">Customer Segmentation</span>
+    
+  </router-link>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Quick search</span>
+    <div class="searchformwrapper">
+      <form class="search" action="search.html" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Search" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="#arvato-customer-segmentation-docs">Contents</a></span>
+      </p>
+      <ul class="current">
+        
+          <li class="toctree-l1 current"><a href="#" class="reference internal current">Arvato Customer Segmentation Docs</a>
+
+            
+              <ul>
+                
+                  <li class="toctree-l2"><a href="#helpers" class="reference internal">Helpers</a></li>
+                
+                  <li class="toctree-l2"><a href="#models" class="reference internal">Models</a></li>
+                
+                  <li class="toctree-l2"><a href="#experiment-tracking" class="reference internal">Experiment Tracking</a></li>
+                
+                  <li class="toctree-l2"><a href="#indices-and-tables" class="reference internal">Indices and tables</a></li>
+                
+              </ul>
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="#">Docs</a> &raquo;</li>
+    
+    <li>Arvato Customer Segmentation Docs</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main">
+            
+  <div class="section" id="arvato-customer-segmentation-docs">
+<h1>Arvato Customer Segmentation Docs<a class="headerlink" href="#arvato-customer-segmentation-docs" title="Permalink to this headline">¶</a></h1>
+<p>Welcome to the project documentation, each module has its own description and source code that can be found here.</p>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Arvato Customer Segmentation Docs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#helpers">Helpers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#models">Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#experiment-tracking">Experiment Tracking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="helpers">
+<h2>Helpers<a class="headerlink" href="#helpers" title="Permalink to this headline">¶</a></h2>
+<p>Some helper functions to complement other modules and make them easier.</p>
+<span class="target" id="module-customer_segmentation.helpers"></span><dl class="function">
+<dt id="customer_segmentation.helpers.constant_columns">
+<code class="sig-prename descclassname">customer_segmentation.helpers.</code><code class="sig-name descname">constant_columns</code><span class="sig-paren">(</span><em class="sig-param">df: pandas.core.frame.DataFrame</em><span class="sig-paren">)</span> &#x2192; Set[str]<a class="reference internal" href="_modules/customer_segmentation/helpers.html#constant_columns"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#customer_segmentation.helpers.constant_columns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gives the constants columns of <cite>df</cite> dataframe</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="customer_segmentation.helpers.dtypes_from_attributes">
+<code class="sig-prename descclassname">customer_segmentation.helpers.</code><code class="sig-name descname">dtypes_from_attributes</code><span class="sig-paren">(</span><em class="sig-param">df: pandas.core.frame.DataFrame</em><span class="sig-paren">)</span> &#x2192; Dict[str, str]<a class="reference internal" href="_modules/customer_segmentation/helpers.html#dtypes_from_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#customer_segmentation.helpers.dtypes_from_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds dtype dictionary from dataframe <cite>df</cite> saving
+a lot of memory with ‘category’ approach vs ‘object’ one</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="customer_segmentation.helpers.kaggle_submission">
+<code class="sig-prename descclassname">customer_segmentation.helpers.</code><code class="sig-name descname">kaggle_submission</code><span class="sig-paren">(</span><em class="sig-param">column_lnr: pandas.core.series.Series</em>, <em class="sig-param">y_pred: numpy.array</em>, <em class="sig-param">submission_filename: str</em>, <em class="sig-param">submission_message: str</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/customer_segmentation/helpers.html#kaggle_submission"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#customer_segmentation.helpers.kaggle_submission" title="Permalink to this definition">¶</a></dt>
+<dd><p>Submits and saves submission data provided
+in <cite>column_lrt</cite> and <cite>y_pred</cite></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="customer_segmentation.helpers.nullity_pct">
+<code class="sig-prename descclassname">customer_segmentation.helpers.</code><code class="sig-name descname">nullity_pct</code><span class="sig-paren">(</span><em class="sig-param">df: pandas.core.frame.DataFrame</em><span class="sig-paren">)</span> &#x2192; pandas.core.series.Series<a class="reference internal" href="_modules/customer_segmentation/helpers.html#nullity_pct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#customer_segmentation.helpers.nullity_pct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the percentage of nulls for each column</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="customer_segmentation.helpers.read_attributes">
+<code class="sig-prename descclassname">customer_segmentation.helpers.</code><code class="sig-name descname">read_attributes</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="_modules/customer_segmentation/helpers.html#read_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#customer_segmentation.helpers.read_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads attributes file provided by Arvato</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="customer_segmentation.helpers.read_demographic_data">
+<code class="sig-prename descclassname">customer_segmentation.helpers.</code><code class="sig-name descname">read_demographic_data</code><span class="sig-paren">(</span><em class="sig-param">filename: str</em>, <em class="sig-param">sample_ratio: float = 1.0</em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="_modules/customer_segmentation/helpers.html#read_demographic_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#customer_segmentation.helpers.read_demographic_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads <cite>sample_ratio</cite> [0, 1] sample of demographic data from
+<cite>filename</cite> located in <cite>PATH_DATA</cite> path</p>
+<p>Uses correct dtypes for saving memory</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="customer_segmentation.helpers.serialize_object_dump">
+<code class="sig-prename descclassname">customer_segmentation.helpers.</code><code class="sig-name descname">serialize_object_dump</code><span class="sig-paren">(</span><em class="sig-param">object_: Any</em>, <em class="sig-param">filename: str</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/customer_segmentation/helpers.html#serialize_object_dump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#customer_segmentation.helpers.serialize_object_dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dumps <cite>object</cite> in <cite>PATH_OBJECTS / filename</cite></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="customer_segmentation.helpers.serialize_object_load">
+<code class="sig-prename descclassname">customer_segmentation.helpers.</code><code class="sig-name descname">serialize_object_load</code><span class="sig-paren">(</span><em class="sig-param">filename: str</em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="_modules/customer_segmentation/helpers.html#serialize_object_load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#customer_segmentation.helpers.serialize_object_load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads serialized object in <cite>PATH_OBJECTS / filename</cite></p>
+</dd></dl>
+
+</div>
+<div class="section" id="models">
+<h2>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
+<p>Sub-module concerning the part of the models, their calculation of metrics or the pre-processing of the data in order to use them.</p>
+<span class="target" id="module-customer_segmentation.models"></span><dl class="exception">
+<dt id="customer_segmentation.models.DataSplitsSizeException">
+<em class="property">exception </em><code class="sig-prename descclassname">customer_segmentation.models.</code><code class="sig-name descname">DataSplitsSizeException</code><a class="reference internal" href="_modules/customer_segmentation/models.html#DataSplitsSizeException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#customer_segmentation.models.DataSplitsSizeException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Customized exception just to clarify “ValueError”
+from <cite>sklearn.model_selection.train_test_split</cite>
+behavior when the test or validation size is not correct
+and none is equal to zero</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="customer_segmentation.models.DataSplitsUnitException">
+<em class="property">exception </em><code class="sig-prename descclassname">customer_segmentation.models.</code><code class="sig-name descname">DataSplitsUnitException</code><a class="reference internal" href="_modules/customer_segmentation/models.html#DataSplitsUnitException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#customer_segmentation.models.DataSplitsUnitException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Custom exception to make
+<cite>sklearn.model_selection.train_test_split</cite>
+only works with the float unit</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="customer_segmentation.models.Features">
+<em class="property">class </em><code class="sig-prename descclassname">customer_segmentation.models.</code><code class="sig-name descname">Features</code><span class="sig-paren">(</span><em class="sig-param">X_train</em>, <em class="sig-param">X_test</em>, <em class="sig-param">X_valid</em><span class="sig-paren">)</span><a class="headerlink" href="#customer_segmentation.models.Features" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="customer_segmentation.models.Features.X_test">
+<em class="property">property </em><code class="sig-name descname">X_test</code><a class="headerlink" href="#customer_segmentation.models.Features.X_test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="customer_segmentation.models.Features.X_train">
+<em class="property">property </em><code class="sig-name descname">X_train</code><a class="headerlink" href="#customer_segmentation.models.Features.X_train" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="customer_segmentation.models.Features.X_valid">
+<em class="property">property </em><code class="sig-name descname">X_valid</code><a class="headerlink" href="#customer_segmentation.models.Features.X_valid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="customer_segmentation.models.Labels">
+<em class="property">class </em><code class="sig-prename descclassname">customer_segmentation.models.</code><code class="sig-name descname">Labels</code><span class="sig-paren">(</span><em class="sig-param">y_train</em>, <em class="sig-param">y_test</em>, <em class="sig-param">y_valid</em><span class="sig-paren">)</span><a class="headerlink" href="#customer_segmentation.models.Labels" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="customer_segmentation.models.Labels.y_test">
+<em class="property">property </em><code class="sig-name descname">y_test</code><a class="headerlink" href="#customer_segmentation.models.Labels.y_test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="customer_segmentation.models.Labels.y_train">
+<em class="property">property </em><code class="sig-name descname">y_train</code><a class="headerlink" href="#customer_segmentation.models.Labels.y_train" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="customer_segmentation.models.Labels.y_valid">
+<em class="property">property </em><code class="sig-name descname">y_valid</code><a class="headerlink" href="#customer_segmentation.models.Labels.y_valid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="customer_segmentation.models.Metrics">
+<em class="property">class </em><code class="sig-prename descclassname">customer_segmentation.models.</code><code class="sig-name descname">Metrics</code><span class="sig-paren">(</span><em class="sig-param">ACC</em>, <em class="sig-param">AUC</em><span class="sig-paren">)</span><a class="headerlink" href="#customer_segmentation.models.Metrics" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="customer_segmentation.models.Metrics.ACC">
+<em class="property">property </em><code class="sig-name descname">ACC</code><a class="headerlink" href="#customer_segmentation.models.Metrics.ACC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="customer_segmentation.models.Metrics.AUC">
+<em class="property">property </em><code class="sig-name descname">AUC</code><a class="headerlink" href="#customer_segmentation.models.Metrics.AUC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="customer_segmentation.models.cat_features_fillna">
+<code class="sig-prename descclassname">customer_segmentation.models.</code><code class="sig-name descname">cat_features_fillna</code><span class="sig-paren">(</span><em class="sig-param">df: pandas.core.frame.DataFrame, cat_features: List[str]</em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="_modules/customer_segmentation/models.html#cat_features_fillna"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#customer_segmentation.models.cat_features_fillna" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fills NA values for each column in <cite>cat_features</cite> for
+<cite>df</cite> dataframe</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="customer_segmentation.models.compute_metrics">
+<code class="sig-prename descclassname">customer_segmentation.models.</code><code class="sig-name descname">compute_metrics</code><span class="sig-paren">(</span><em class="sig-param">model: Union[sklearn.pipeline.Pipeline, catboost.core.CatBoostClassifier], X: pandas.core.frame.DataFrame, y: pandas.core.series.Series</em><span class="sig-paren">)</span> &#x2192; customer_segmentation.models.Metrics<a class="reference internal" href="_modules/customer_segmentation/models.html#compute_metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#customer_segmentation.models.compute_metrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes <cite>model</cite> metrics for <cite>X</cite> and
+<cite>y</cite></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="customer_segmentation.models.load_catboost_model">
+<code class="sig-prename descclassname">customer_segmentation.models.</code><code class="sig-name descname">load_catboost_model</code><span class="sig-paren">(</span><em class="sig-param">model_name: str</em><span class="sig-paren">)</span> &#x2192; catboost.core.CatBoostClassifier<a class="reference internal" href="_modules/customer_segmentation/models.html#load_catboost_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#customer_segmentation.models.load_catboost_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads <cite>model_name</cite> from <cite>PATH_MODELS</cite> and returns
+the fitted catboost model</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="customer_segmentation.models.load_pipeline">
+<code class="sig-prename descclassname">customer_segmentation.models.</code><code class="sig-name descname">load_pipeline</code><span class="sig-paren">(</span><em class="sig-param">model_name: str</em><span class="sig-paren">)</span> &#x2192; catboost.core.CatBoostClassifier<a class="reference internal" href="_modules/customer_segmentation/models.html#load_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#customer_segmentation.models.load_pipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads <cite>model_name</cite> from <cite>PATH_MODELS</cite> and returns
+the fitted catboost model</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="customer_segmentation.models.preprocessing_baseline">
+<code class="sig-prename descclassname">customer_segmentation.models.</code><code class="sig-name descname">preprocessing_baseline</code><span class="sig-paren">(</span><em class="sig-param">df: pandas.core.frame.DataFrame, cat_features: List[str], target: str, test_size: float = 0.15, valid_size: float = 0.15</em><span class="sig-paren">)</span> &#x2192; Tuple[customer_segmentation.models.Features, customer_segmentation.models.Labels]<a class="reference internal" href="_modules/customer_segmentation/models.html#preprocessing_baseline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#customer_segmentation.models.preprocessing_baseline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates <cite>features</cite> and <cite>labels</cite> splits and fill NA values
+for categorical features passed in <cite>cat_features</cite> from data
+in <cite>df</cite> dataframe</p>
+<p>Target feature must be provided in <cite>target</cite> arg</p>
+<p><cite>test_size</cite> and <cite>valid_size</cite> has to be greater than zero and
+less too one, if it is 0 removes that split set</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="customer_segmentation.models.save_catboost_model">
+<code class="sig-prename descclassname">customer_segmentation.models.</code><code class="sig-name descname">save_catboost_model</code><span class="sig-paren">(</span><em class="sig-param">catboost_model: catboost.core.CatBoostClassifier</em>, <em class="sig-param">model_name: str</em>, <em class="sig-param">pool_data: catboost.core.Pool</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/customer_segmentation/models.html#save_catboost_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#customer_segmentation.models.save_catboost_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves model <cite>catboost_model</cite> to <cite>PATH_MODELS</cite> with the name
+passed in <cite>model_name</cite></p>
+<p><cite>pool_data</cite> contains <cite>Pool</cite> object with features and lkabels used
+to fit the model and its categorical features</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="customer_segmentation.models.save_pipeline">
+<code class="sig-prename descclassname">customer_segmentation.models.</code><code class="sig-name descname">save_pipeline</code><span class="sig-paren">(</span><em class="sig-param">pipeline: sklearn.pipeline.Pipeline</em>, <em class="sig-param">model_name: str</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/customer_segmentation/models.html#save_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#customer_segmentation.models.save_pipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves model <cite>pipeline</cite> to <cite>PATH_MODELS</cite> with the name
+passed in <cite>model_name</cite></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="customer_segmentation.models.show_metrics_baseline">
+<code class="sig-prename descclassname">customer_segmentation.models.</code><code class="sig-name descname">show_metrics_baseline</code><span class="sig-paren">(</span><em class="sig-param">model: Union[sklearn.pipeline.Pipeline, catboost.core.CatBoostClassifier], features: customer_segmentation.models.Features, labels: customer_segmentation.models.Labels</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/customer_segmentation/models.html#show_metrics_baseline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#customer_segmentation.models.show_metrics_baseline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Giving <cite>model</cite>, <cite>features</cite> and <cite>labels</cite> show accuracy and AUC
+for training, testing and validation data</p>
+<p>Model passed in argument <cite>model</cite> has to be already fitted</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="customer_segmentation.models.target_stats_by_feature">
+<code class="sig-prename descclassname">customer_segmentation.models.</code><code class="sig-name descname">target_stats_by_feature</code><span class="sig-paren">(</span><em class="sig-param">df: pandas.core.frame.DataFrame</em>, <em class="sig-param">feature: str</em>, <em class="sig-param">target: str</em>, <em class="sig-param">fillna_value: Union[str</em>, <em class="sig-param">float] = None</em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="_modules/customer_segmentation/models.html#target_stats_by_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#customer_segmentation.models.target_stats_by_feature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the mean and the volume of <cite>target</cite> for each value of <cite>feature</cite></p>
+</dd></dl>
+
+</div>
+<div class="section" id="experiment-tracking">
+<h2>Experiment Tracking<a class="headerlink" href="#experiment-tracking" title="Permalink to this headline">¶</a></h2>
+<p>All the experiments made in this project are traced with functions provided by this module.</p>
+<span class="target" id="module-customer_segmentation.experiment_tracking"></span><dl class="class">
+<dt id="customer_segmentation.experiment_tracking.Tracking">
+<em class="property">class </em><code class="sig-prename descclassname">customer_segmentation.experiment_tracking.</code><code class="sig-name descname">Tracking</code><span class="sig-paren">(</span><em class="sig-param">run_name</em>, <em class="sig-param">tags</em>, <em class="sig-param">params</em>, <em class="sig-param">metrics</em>, <em class="sig-param">model</em>, <em class="sig-param">model_name</em><span class="sig-paren">)</span><a class="headerlink" href="#customer_segmentation.experiment_tracking.Tracking" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="customer_segmentation.experiment_tracking.Tracking.metrics">
+<em class="property">property </em><code class="sig-name descname">metrics</code><a class="headerlink" href="#customer_segmentation.experiment_tracking.Tracking.metrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="customer_segmentation.experiment_tracking.Tracking.model">
+<em class="property">property </em><code class="sig-name descname">model</code><a class="headerlink" href="#customer_segmentation.experiment_tracking.Tracking.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="customer_segmentation.experiment_tracking.Tracking.model_name">
+<em class="property">property </em><code class="sig-name descname">model_name</code><a class="headerlink" href="#customer_segmentation.experiment_tracking.Tracking.model_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 5</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="customer_segmentation.experiment_tracking.Tracking.params">
+<em class="property">property </em><code class="sig-name descname">params</code><a class="headerlink" href="#customer_segmentation.experiment_tracking.Tracking.params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="customer_segmentation.experiment_tracking.Tracking.run_name">
+<em class="property">property </em><code class="sig-name descname">run_name</code><a class="headerlink" href="#customer_segmentation.experiment_tracking.Tracking.run_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="customer_segmentation.experiment_tracking.Tracking.tags">
+<em class="property">property </em><code class="sig-name descname">tags</code><a class="headerlink" href="#customer_segmentation.experiment_tracking.Tracking.tags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="customer_segmentation.experiment_tracking.apply_runs_to_experiment">
+<code class="sig-prename descclassname">customer_segmentation.experiment_tracking.</code><code class="sig-name descname">apply_runs_to_experiment</code><span class="sig-paren">(</span><em class="sig-param">experiment_id: str, trackings: List[customer_segmentation.experiment_tracking.Tracking]</em><span class="sig-paren">)</span> &#x2192; List[str]<a class="reference internal" href="_modules/customer_segmentation/experiment_tracking.html#apply_runs_to_experiment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#customer_segmentation.experiment_tracking.apply_runs_to_experiment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Giving an <cite>experiment_id</cite> and a list of trackings,
+which defines each run of the experiment</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="customer_segmentation.experiment_tracking.load_best_model">
+<code class="sig-prename descclassname">customer_segmentation.experiment_tracking.</code><code class="sig-name descname">load_best_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Union[catboost.core.CatBoostClassifier, sklearn.pipeline.Pipeline]<a class="reference internal" href="_modules/customer_segmentation/experiment_tracking.html#load_best_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#customer_segmentation.experiment_tracking.load_best_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut to get the best model applying
+<cite>load_trained_model</cite></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="customer_segmentation.experiment_tracking.load_trained_model">
+<code class="sig-prename descclassname">customer_segmentation.experiment_tracking.</code><code class="sig-name descname">load_trained_model</code><span class="sig-paren">(</span><em class="sig-param">model_artifact_uri: str</em>, <em class="sig-param">model_model_name: str</em><span class="sig-paren">)</span> &#x2192; Union[catboost.core.CatBoostClassifier, sklearn.pipeline.Pipeline]<a class="reference internal" href="_modules/customer_segmentation/experiment_tracking.html#load_trained_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#customer_segmentation.experiment_tracking.load_trained_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load trained model from <cite>model_artifact_uri</cite>
+giving also its name <cite>model_model_name</cite> uri</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="customer_segmentation.experiment_tracking.n_best_models_from_experiments">
+<code class="sig-prename descclassname">customer_segmentation.experiment_tracking.</code><code class="sig-name descname">n_best_models_from_experiments</code><span class="sig-paren">(</span><em class="sig-param">experiment_ids: List[str], n: int, order_by: List[str]</em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="_modules/customer_segmentation/experiment_tracking.html#n_best_models_from_experiments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#customer_segmentation.experiment_tracking.n_best_models_from_experiments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets <cite>n</cite> best models from every runs in <cite>experiments_ids</cite></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="customer_segmentation.experiment_tracking.new_experiment">
+<code class="sig-prename descclassname">customer_segmentation.experiment_tracking.</code><code class="sig-name descname">new_experiment</code><span class="sig-paren">(</span><em class="sig-param">name: str</em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="_modules/customer_segmentation/experiment_tracking.html#new_experiment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#customer_segmentation.experiment_tracking.new_experiment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an experiment in <cite>PATH_MLFLOW_TRACKING</cite> and
+return the experiment id</p>
+<p>If the experiment already exists, return its id</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="customer_segmentation.experiment_tracking.new_run">
+<code class="sig-prename descclassname">customer_segmentation.experiment_tracking.</code><code class="sig-name descname">new_run</code><span class="sig-paren">(</span><em class="sig-param">experiment_id</em>, <em class="sig-param">run_name</em>, <em class="sig-param">tags</em>, <em class="sig-param">params</em>, <em class="sig-param">metrics</em>, <em class="sig-param">model</em>, <em class="sig-param">model_name</em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="_modules/customer_segmentation/experiment_tracking.html#new_run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#customer_segmentation.experiment_tracking.new_run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new run in the experiment with id <cite>experiment_id</cite>
+and return the run id</p>
+</dd></dl>
+
+</div>
+<div class="section" id="indices-and-tables">
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2020, Sergio Calderón Pérez-Lozao.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4 with <a href="https://github.com/schettino72/sphinx_press_theme">Press Theme</a>.
+</div>
+            </div>
+          </div>
+      </page>
+    </div>
+    
+    
+  </body>
+</html>

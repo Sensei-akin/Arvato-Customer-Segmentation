@@ -6,13 +6,23 @@ from typing import Dict, Set, Any
 from kaggle.api.kaggle_api_extended import KaggleApi
 from joblib import dump, load
 
-from .constants import PATH_DATA, PATH_FILE_ATTRIBUTES, PATH_SUBMISSIONS, SEP, NA_VALUES, RANDOM_STATE, PATH_OBJECTS
+from .constants import (PATH_DATA,
+                        PATH_FILE_ATTRIBUTES,
+                        PATH_SUBMISSIONS,
+                        SEP,
+                        NA_VALUES,
+                        RANDOM_STATE,
+                        PATH_OBJECTS)
 
 
 def read_attributes() -> pd.DataFrame:
     """Reads attributes file provided by Arvato
     """
-    df_attributes = pd.read_excel(PATH_FILE_ATTRIBUTES, header=1, usecols=['Attribute', 'Description', 'Meaning'])
+    df_attributes = pd.read_excel(
+        PATH_FILE_ATTRIBUTES,
+        header=1,
+        usecols=['Attribute', 'Description', 'Meaning']
+    )
 
     df_attributes.columns = map(str.lower, df_attributes.columns)
 
@@ -36,7 +46,8 @@ def dtypes_from_attributes(df: pd.DataFrame) -> Dict[str, str]:
             for attribute, is_numeric in dict_attributes.items()}
 
 
-def read_demographic_data(filename: str, sample_ratio: float = 1.0) -> pd.DataFrame:
+def read_demographic_data(filename: str,
+                          sample_ratio: float = 1.0) -> pd.DataFrame:
     """Reads `sample_ratio` [0, 1] sample of demographic data from
     `filename` located in `PATH_DATA` path
 
@@ -73,10 +84,12 @@ def nullity_pct(df: pd.DataFrame) -> pd.Series:
     return df.isnull().mean()
 
 
-def kaggle_submission(column_lnr: pd.Series, y_pred: np.array,
-                      submission_filename: str, submission_message: str) -> None:
-    """Submits and saves submission data provided in `column_lrt` and
-    `y_pred`
+def kaggle_submission(column_lnr: pd.Series,
+                      y_pred: np.array,
+                      submission_filename: str,
+                      submission_message: str) -> None:
+    """Submits and saves submission data provided
+    in `column_lrt` and `y_pred`
     """
     filepath = PATH_SUBMISSIONS / f'{submission_filename}.csv'
     df_kaggle_submission = pd.DataFrame(dict(LNR=column_lnr, RESPONSE=y_pred))
@@ -86,9 +99,11 @@ def kaggle_submission(column_lnr: pd.Series, y_pred: np.array,
     kaggle_api = KaggleApi()
     kaggle_api.authenticate()
 
-    print(kaggle_api.competition_submit(filepath,
-                                        message=submission_message,
-                                        competition='udacity-arvato-identify-customers'))
+    print(kaggle_api
+          .competition_submit(filepath,
+                              message=submission_message,
+                              competition='udacity-arvato-identify-customers')
+    )
 
 
 def serialize_object_dump(object_: Any, filename: str) -> None:

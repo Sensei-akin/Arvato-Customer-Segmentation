@@ -33,7 +33,8 @@ class DataSplitsSizeException(Exception):
     pass
 
 
-def cat_features_fillna(df: pd.DataFrame, cat_features: List[str]) -> pd.DataFrame:
+def cat_features_fillna(df: pd.DataFrame,
+                        cat_features: List[str]) -> pd.DataFrame:
     """Fills NA values for each column in `cat_features` for
     `df` dataframe
     """
@@ -41,9 +42,12 @@ def cat_features_fillna(df: pd.DataFrame, cat_features: List[str]) -> pd.DataFra
 
     for cat in cat_features:
         try:
-            df_copy[cat] = df_copy[cat].cat.add_categories('UNKNOWN').fillna('UNKNOWN')
+            df_copy[cat] = (
+                df_copy[cat].cat.add_categories('UNKNOWN').fillna('UNKNOWN')
+            )
+
         except AttributeError:
-            # AttributeError is raised when the type is object instead of category
+            # The dtype is object instead of category
             df_copy[cat] = df_copy[cat].fillna('UNKNOWN')
 
     return df_copy
@@ -55,7 +59,7 @@ def preprocessing_baseline(df: pd.DataFrame,
                            test_size: float = .15,
                            valid_size: float = .15) -> Tuple[Features, Labels]:
     """Creates `features` and `labels` splits and fill NA values
-     for categorical features passed in `cat_features` from data
+    for categorical features passed in `cat_features` from data
     in `df` dataframe
 
     Target feature must be provided in `target` arg
@@ -65,7 +69,8 @@ def preprocessing_baseline(df: pd.DataFrame,
     """
     if 0 < test_size >= 1 or 0 < valid_size >= 1:
         raise DataSplitsUnitException(
-            'The parameters test_size and valid_size have to be greater than zero and less too one'
+            'The parameters test_size and valid_size have to be '
+            'greater than zero and less too one'
         )
 
     X = df.drop(columns=target)
@@ -75,7 +80,11 @@ def preprocessing_baseline(df: pd.DataFrame,
 
     try:
         X_train, X_test_and_valid, y_train, y_test_and_valid = train_test_split(
-            X_filled, y, test_size=test_size + valid_size, random_state=RANDOM_STATE, stratify=y
+            X_filled,
+            y,
+            test_size=test_size + valid_size,
+            random_state=RANDOM_STATE,
+            stratify=y
         )
 
         X_test, X_valid, y_test, y_valid = (
@@ -88,7 +97,8 @@ def preprocessing_baseline(df: pd.DataFrame,
     except ValueError as value_error:
         if (test_size + valid_size) >= 1:
             raise DataSplitsSizeException(
-                'The size of the test and validation data added together is greater than or equal to one'
+                'The size of the test and validation data added together '
+                'is greater than or equal to one'
             ) from value_error
         elif test_size == valid_size == 0:
             X_train, y_train = X_filled.copy(), y.copy()
@@ -96,13 +106,21 @@ def preprocessing_baseline(df: pd.DataFrame,
             X_valid, y_valid = pd.DataFrame(), pd.Series()
         elif test_size == 0:
             X_train, X_valid, y_train, y_valid = train_test_split(
-                X_filled, y, test_size=valid_size, random_state=RANDOM_STATE, stratify=y
+                X_filled,
+                y,
+                test_size=valid_size,
+                random_state=RANDOM_STATE,
+                stratify=y
             )
 
             X_test, y_test = pd.DataFrame(), pd.Series()
         elif valid_size == 0:
             X_train, X_test, y_train, y_test = train_test_split(
-                X_filled, y, test_size=test_size, random_state=RANDOM_STATE, stratify=y
+                X_filled,
+                y,
+                test_size=test_size,
+                random_state=RANDOM_STATE,
+                stratify=y
             )
 
             X_valid, y_valid = pd.DataFrame(), pd.Series()
@@ -113,7 +131,12 @@ def preprocessing_baseline(df: pd.DataFrame,
             Labels(y_train, y_test, y_valid))
 
 
-def compute_metrics(model: Union[Pipeline, CatBoostClassifier], X: pd.DataFrame, y: pd.Series) -> Metrics:
+def compute_metrics(model: Union[Pipeline, CatBoostClassifier],
+                    X: pd.DataFrame,
+                    y: pd.Series) -> Metrics:
+    """Computes `model` metrics for `X` and
+    `y`
+    """
     predict = model.predict(X)
     predict_proba = model.predict_proba(X)[:, 1]
 
@@ -123,7 +146,9 @@ def compute_metrics(model: Union[Pipeline, CatBoostClassifier], X: pd.DataFrame,
     return Metrics(ACC=acc, AUC=auc)
 
 
-def show_metrics_baseline(model: Union[Pipeline, CatBoostClassifier], features: Features, labels: Labels) -> None:
+def show_metrics_baseline(model: Union[Pipeline, CatBoostClassifier],
+                          features: Features,
+                          labels: Labels) -> None:
     """Giving `model`, `features` and `labels` show accuracy and AUC
     for training, testing and validation data
 
@@ -132,18 +157,25 @@ def show_metrics_baseline(model: Union[Pipeline, CatBoostClassifier], features: 
     split_names = [field.replace('X_', '').capitalize()
                    for field in features._fields]
 
-    for split_name, split_features, split_labels in zip(split_names, features, labels):
+    for split_name, split_features, split_labels in zip(split_names,
+                                                        features,
+                                                        labels):
         if split_features.empty:
             continue
 
-        split_acc, split_auc = compute_metrics(model, X=split_features, y=split_labels)
+        split_acc, split_auc = compute_metrics(model,
+                                               X=split_features,
+                                               y=split_labels)
 
         print(f'Accuracy {split_name}: {split_acc}')
         print(f'AUC {split_name}: {split_auc}')
 
 
-def target_stats_by_feature(df: pd.DataFrame, feature: str,
-                            target: str, fillna_value: Union[str, float] = None) -> pd.DataFrame:
+def target_stats_by_feature(df: pd.DataFrame,
+                            feature: str,
+                            target: str,
+                            fillna_value: Union[str,
+                                                float] = None) -> pd.DataFrame:
     """Computes the mean and the volume of `target` for each value of `feature`
     """
     df_copy = (
@@ -163,7 +195,9 @@ def target_stats_by_feature(df: pd.DataFrame, feature: str,
     return df_grouped.sort_values(by=f'{target}_mean', ascending=False)
 
 
-def save_catboost_model(catboost_model: CatBoostClassifier, model_name: str, pool_data: Pool) -> None:
+def save_catboost_model(catboost_model: CatBoostClassifier,
+                        model_name: str,
+                        pool_data: Pool) -> None:
     """Saves model `catboost_model` to `PATH_MODELS` with the name
     passed in `model_name`
 

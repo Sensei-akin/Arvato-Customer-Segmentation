@@ -18,3 +18,4 @@ mlflow==1.7.2
 scikit_learn==0.22.2.post1
 sklego==0.0
 xgboost==1.0.2
+sphinx==2.4.4

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html >
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+      <title>customer_segmentation.models</title>
+    
+      <link rel="stylesheet" href="../../_static/pygments.css">
+      <link rel="stylesheet" href="../../_static/theme.css">
+      <link rel="stylesheet" href="../../_static/sphinx_press_theme.css">
+      
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+
+      <!-- sphinx script_files -->
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+
+      
+      <script src="../../_static/theme-vendors.js"></script>
+      <script src="../../_static/theme.js" defer></script>
+    
+  <link rel="index" title="Index" href="../../genindex.html" />
+  <link rel="search" title="Search" href="../../search.html" /> 
+  </head>
+
+  <body>
+    <div id="app" class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <router-link to="../../index.html" class="home-link">
+    
+      <span class="site-name">Customer Segmentation</span>
+    
+  </router-link>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Quick search</span>
+    <div class="searchformwrapper">
+      <form class="search" action="../../search.html" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Search" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../../index.html#arvato-customer-segmentation-docs">Contents</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 "><a href="../../index.html" class="reference internal ">Arvato Customer Segmentation Docs</a>
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+    
+      <li><a href="../index.html">Module code</a> &raquo;</li>
+    
+    <li>customer_segmentation.models</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main">
+            
+  <h1>Source code for customer_segmentation.models</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">catboost</span> <span class="kn">import</span> <span class="n">CatBoostClassifier</span><span class="p">,</span> <span class="n">Pool</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span><span class="p">,</span> <span class="n">roc_auc_score</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span> <span class="nn">joblib</span> <span class="kn">import</span> <span class="n">dump</span><span class="p">,</span> <span class="n">load</span>
+
+<span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="n">PATH_MODELS</span><span class="p">,</span> <span class="n">RANDOM_STATE</span>
+
+
+<span class="n">Features</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Features&#39;</span><span class="p">,</span> <span class="s1">&#39;X_train X_test X_valid&#39;</span><span class="p">)</span>
+<span class="n">Labels</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Labels&#39;</span><span class="p">,</span> <span class="s1">&#39;y_train y_test y_valid&#39;</span><span class="p">)</span>
+<span class="n">Metrics</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Metrics&#39;</span><span class="p">,</span> <span class="s1">&#39;ACC AUC&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="DataSplitsUnitException"><a class="viewcode-back" href="../../index.html#customer_segmentation.models.DataSplitsUnitException">[docs]</a><span class="k">class</span> <span class="nc">DataSplitsUnitException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Custom exception to make</span>
+<span class="sd">    `sklearn.model_selection.train_test_split`</span>
+<span class="sd">    only works with the float unit</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="DataSplitsSizeException"><a class="viewcode-back" href="../../index.html#customer_segmentation.models.DataSplitsSizeException">[docs]</a><span class="k">class</span> <span class="nc">DataSplitsSizeException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Customized exception just to clarify &quot;ValueError&quot;</span>
+<span class="sd">    from `sklearn.model_selection.train_test_split`</span>
+<span class="sd">    behavior when the test or validation size is not correct</span>
+<span class="sd">    and none is equal to zero</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="cat_features_fillna"><a class="viewcode-back" href="../../index.html#customer_segmentation.models.cat_features_fillna">[docs]</a><span class="k">def</span> <span class="nf">cat_features_fillna</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+                        <span class="n">cat_features</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Fills NA values for each column in `cat_features` for</span>
+<span class="sd">    `df` dataframe</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df_copy</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">cat</span> <span class="ow">in</span> <span class="n">cat_features</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">df_copy</span><span class="p">[</span><span class="n">cat</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">df_copy</span><span class="p">[</span><span class="n">cat</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">add_categories</span><span class="p">(</span><span class="s1">&#39;UNKNOWN&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="s1">&#39;UNKNOWN&#39;</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="c1"># The dtype is object instead of category</span>
+            <span class="n">df_copy</span><span class="p">[</span><span class="n">cat</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_copy</span><span class="p">[</span><span class="n">cat</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="s1">&#39;UNKNOWN&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df_copy</span></div>
+
+
+<div class="viewcode-block" id="preprocessing_baseline"><a class="viewcode-back" href="../../index.html#customer_segmentation.models.preprocessing_baseline">[docs]</a><span class="k">def</span> <span class="nf">preprocessing_baseline</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+                           <span class="n">cat_features</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+                           <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                           <span class="n">test_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">.</span><span class="mi">15</span><span class="p">,</span>
+                           <span class="n">valid_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">.</span><span class="mi">15</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Features</span><span class="p">,</span> <span class="n">Labels</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Creates `features` and `labels` splits and fill NA values</span>
+<span class="sd">    for categorical features passed in `cat_features` from data</span>
+<span class="sd">    in `df` dataframe</span>
+
+<span class="sd">    Target feature must be provided in `target` arg</span>
+
+<span class="sd">    `test_size` and `valid_size` has to be greater than zero and</span>
+<span class="sd">    less too one, if it is 0 removes that split set</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">test_size</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">valid_size</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">DataSplitsUnitException</span><span class="p">(</span>
+            <span class="s1">&#39;The parameters test_size and valid_size have to be &#39;</span>
+            <span class="s1">&#39;greater than zero and less too one&#39;</span>
+        <span class="p">)</span>
+
+    <span class="n">X</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">target</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">target</span><span class="p">]</span>
+
+    <span class="n">X_filled</span> <span class="o">=</span> <span class="n">cat_features_fillna</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">cat_features</span><span class="o">=</span><span class="n">cat_features</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test_and_valid</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test_and_valid</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+            <span class="n">X_filled</span><span class="p">,</span>
+            <span class="n">y</span><span class="p">,</span>
+            <span class="n">test_size</span><span class="o">=</span><span class="n">test_size</span> <span class="o">+</span> <span class="n">valid_size</span><span class="p">,</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="n">RANDOM_STATE</span><span class="p">,</span>
+            <span class="n">stratify</span><span class="o">=</span><span class="n">y</span>
+        <span class="p">)</span>
+
+        <span class="n">X_test</span><span class="p">,</span> <span class="n">X_valid</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">y_valid</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">train_test_split</span><span class="p">(</span><span class="n">X_test_and_valid</span><span class="p">,</span>
+                             <span class="n">y_test_and_valid</span><span class="p">,</span>
+                             <span class="n">test_size</span><span class="o">=</span><span class="n">valid_size</span> <span class="o">/</span> <span class="p">(</span><span class="n">test_size</span> <span class="o">+</span> <span class="n">valid_size</span><span class="p">),</span>
+                             <span class="n">random_state</span><span class="o">=</span><span class="n">RANDOM_STATE</span><span class="p">,</span>
+                             <span class="n">stratify</span><span class="o">=</span><span class="n">y_test_and_valid</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">value_error</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">test_size</span> <span class="o">+</span> <span class="n">valid_size</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DataSplitsSizeException</span><span class="p">(</span>
+                <span class="s1">&#39;The size of the test and validation data added together &#39;</span>
+                <span class="s1">&#39;is greater than or equal to one&#39;</span>
+            <span class="p">)</span> <span class="kn">from</span> <span class="nn">value_error</span>
+        <span class="k">elif</span> <span class="n">test_size</span> <span class="o">==</span> <span class="n">valid_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span> <span class="o">=</span> <span class="n">X_filled</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">y</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(),</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">()</span>
+            <span class="n">X_valid</span><span class="p">,</span> <span class="n">y_valid</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(),</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">test_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">X_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_valid</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+                <span class="n">X_filled</span><span class="p">,</span>
+                <span class="n">y</span><span class="p">,</span>
+                <span class="n">test_size</span><span class="o">=</span><span class="n">valid_size</span><span class="p">,</span>
+                <span class="n">random_state</span><span class="o">=</span><span class="n">RANDOM_STATE</span><span class="p">,</span>
+                <span class="n">stratify</span><span class="o">=</span><span class="n">y</span>
+            <span class="p">)</span>
+
+            <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(),</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">valid_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+                <span class="n">X_filled</span><span class="p">,</span>
+                <span class="n">y</span><span class="p">,</span>
+                <span class="n">test_size</span><span class="o">=</span><span class="n">test_size</span><span class="p">,</span>
+                <span class="n">random_state</span><span class="o">=</span><span class="n">RANDOM_STATE</span><span class="p">,</span>
+                <span class="n">stratify</span><span class="o">=</span><span class="n">y</span>
+            <span class="p">)</span>
+
+            <span class="n">X_valid</span><span class="p">,</span> <span class="n">y_valid</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(),</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">value_error</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">Features</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">X_valid</span><span class="p">),</span>
+            <span class="n">Labels</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="compute_metrics"><a class="viewcode-back" href="../../index.html#customer_segmentation.models.compute_metrics">[docs]</a><span class="k">def</span> <span class="nf">compute_metrics</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Pipeline</span><span class="p">,</span> <span class="n">CatBoostClassifier</span><span class="p">],</span>
+                    <span class="n">X</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+                    <span class="n">y</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Metrics</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Computes `model` metrics for `X` and</span>
+<span class="sd">    `y`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">predict</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">predict_proba</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X</span><span class="p">)[:,</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">acc</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">predict</span><span class="p">)</span>
+    <span class="n">auc</span> <span class="o">=</span> <span class="n">roc_auc_score</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">predict_proba</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">Metrics</span><span class="p">(</span><span class="n">ACC</span><span class="o">=</span><span class="n">acc</span><span class="p">,</span> <span class="n">AUC</span><span class="o">=</span><span class="n">auc</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="show_metrics_baseline"><a class="viewcode-back" href="../../index.html#customer_segmentation.models.show_metrics_baseline">[docs]</a><span class="k">def</span> <span class="nf">show_metrics_baseline</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Pipeline</span><span class="p">,</span> <span class="n">CatBoostClassifier</span><span class="p">],</span>
+                          <span class="n">features</span><span class="p">:</span> <span class="n">Features</span><span class="p">,</span>
+                          <span class="n">labels</span><span class="p">:</span> <span class="n">Labels</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Giving `model`, `features` and `labels` show accuracy and AUC</span>
+<span class="sd">    for training, testing and validation data</span>
+
+<span class="sd">    Model passed in argument `model` has to be already fitted</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">split_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">field</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;X_&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span>
+                   <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">features</span><span class="o">.</span><span class="n">_fields</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">split_name</span><span class="p">,</span> <span class="n">split_features</span><span class="p">,</span> <span class="n">split_labels</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">split_names</span><span class="p">,</span>
+                                                        <span class="n">features</span><span class="p">,</span>
+                                                        <span class="n">labels</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">split_features</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="n">split_acc</span><span class="p">,</span> <span class="n">split_auc</span> <span class="o">=</span> <span class="n">compute_metrics</span><span class="p">(</span><span class="n">model</span><span class="p">,</span>
+                                               <span class="n">X</span><span class="o">=</span><span class="n">split_features</span><span class="p">,</span>
+                                               <span class="n">y</span><span class="o">=</span><span class="n">split_labels</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Accuracy </span><span class="si">{</span><span class="n">split_name</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">split_acc</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;AUC </span><span class="si">{</span><span class="n">split_name</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">split_auc</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="target_stats_by_feature"><a class="viewcode-back" href="../../index.html#customer_segmentation.models.target_stats_by_feature">[docs]</a><span class="k">def</span> <span class="nf">target_stats_by_feature</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+                            <span class="n">feature</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                            <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                            <span class="n">fillna_value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span>
+                                                <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Computes the mean and the volume of `target` for each value of `feature`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df_copy</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="n">feature</span><span class="p">,</span> <span class="n">target</span><span class="p">]]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">fillna_value</span><span class="p">)</span> <span class="k">if</span> <span class="n">fillna_value</span>
+        <span class="k">else</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="n">feature</span><span class="p">,</span> <span class="n">target</span><span class="p">]]</span>
+    <span class="p">)</span>
+
+    <span class="n">df_grouped</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">df_copy</span>
+            <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">feature</span><span class="p">)[</span><span class="n">target</span><span class="p">]</span>
+            <span class="o">.</span><span class="n">agg</span><span class="p">([</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;count&#39;</span><span class="p">])</span>
+            <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="p">)</span>
+
+    <span class="n">df_grouped</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">feature</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s1">_mean&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s1">_count&#39;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">df_grouped</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s1">_mean&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="save_catboost_model"><a class="viewcode-back" href="../../index.html#customer_segmentation.models.save_catboost_model">[docs]</a><span class="k">def</span> <span class="nf">save_catboost_model</span><span class="p">(</span><span class="n">catboost_model</span><span class="p">:</span> <span class="n">CatBoostClassifier</span><span class="p">,</span>
+                        <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                        <span class="n">pool_data</span><span class="p">:</span> <span class="n">Pool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Saves model `catboost_model` to `PATH_MODELS` with the name</span>
+<span class="sd">    passed in `model_name`</span>
+
+<span class="sd">    `pool_data` contains `Pool` object with features and lkabels used</span>
+<span class="sd">    to fit the model and its categorical features</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">catboost_model</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">PATH_MODELS</span> <span class="o">/</span> <span class="n">model_name</span><span class="p">),</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool_data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="load_catboost_model"><a class="viewcode-back" href="../../index.html#customer_segmentation.models.load_catboost_model">[docs]</a><span class="k">def</span> <span class="nf">load_catboost_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CatBoostClassifier</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Reads `model_name` from `PATH_MODELS` and returns</span>
+<span class="sd">    the fitted catboost model</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">test_model_from_file</span> <span class="o">=</span> <span class="n">CatBoostClassifier</span><span class="p">()</span>
+
+    <span class="n">test_model_from_file</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">PATH_MODELS</span> <span class="o">/</span> <span class="n">model_name</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">test_model_from_file</span></div>
+
+
+<div class="viewcode-block" id="save_pipeline"><a class="viewcode-back" href="../../index.html#customer_segmentation.models.save_pipeline">[docs]</a><span class="k">def</span> <span class="nf">save_pipeline</span><span class="p">(</span><span class="n">pipeline</span><span class="p">:</span> <span class="n">Pipeline</span><span class="p">,</span> <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Saves model `pipeline` to `PATH_MODELS` with the name</span>
+<span class="sd">    passed in `model_name`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dump</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">PATH_MODELS</span> <span class="o">/</span> <span class="n">model_name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="load_pipeline"><a class="viewcode-back" href="../../index.html#customer_segmentation.models.load_pipeline">[docs]</a><span class="k">def</span> <span class="nf">load_pipeline</span><span class="p">(</span><span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CatBoostClassifier</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Reads `model_name` from `PATH_MODELS` and returns</span>
+<span class="sd">    the fitted catboost model</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">load</span><span class="p">(</span><span class="n">PATH_MODELS</span> <span class="o">/</span> <span class="n">model_name</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2020, Sergio Calderón Pérez-Lozao.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4 with <a href="https://github.com/schettino72/sphinx_press_theme">Press Theme</a>.
+</div>
+            </div>
+          </div>
+      </page>
+    </div>
+    
+    
+  </body>
+</html>

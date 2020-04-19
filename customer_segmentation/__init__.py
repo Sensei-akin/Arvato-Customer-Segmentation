@@ -17,4 +17,5 @@ from .experiment_tracking import (new_experiment,
                                   new_run,
                                   apply_runs_to_experiment,
                                   n_best_models_from_experiments,
-                                  load_trained_model)
+                                  load_trained_model,
+                                  load_best_model)

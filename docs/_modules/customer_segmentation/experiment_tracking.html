@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html >
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+      <title>customer_segmentation.experiment_tracking</title>
+    
+      <link rel="stylesheet" href="../../_static/pygments.css">
+      <link rel="stylesheet" href="../../_static/theme.css">
+      <link rel="stylesheet" href="../../_static/sphinx_press_theme.css">
+      
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+
+      <!-- sphinx script_files -->
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+
+      
+      <script src="../../_static/theme-vendors.js"></script>
+      <script src="../../_static/theme.js" defer></script>
+    
+  <link rel="index" title="Index" href="../../genindex.html" />
+  <link rel="search" title="Search" href="../../search.html" /> 
+  </head>
+
+  <body>
+    <div id="app" class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <router-link to="../../index.html" class="home-link">
+    
+      <span class="site-name">Customer Segmentation</span>
+    
+  </router-link>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Quick search</span>
+    <div class="searchformwrapper">
+      <form class="search" action="../../search.html" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Search" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../../index.html#arvato-customer-segmentation-docs">Contents</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 "><a href="../../index.html" class="reference internal ">Arvato Customer Segmentation Docs</a>
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+    
+      <li><a href="../index.html">Module code</a> &raquo;</li>
+    
+    <li>customer_segmentation.experiment_tracking</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main">
+            
+  <h1>Source code for customer_segmentation.experiment_tracking</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span> <span class="nn">mlflow.sklearn</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">mlflow.exceptions</span> <span class="kn">import</span> <span class="n">MlflowException</span>
+<span class="kn">from</span> <span class="nn">catboost</span> <span class="kn">import</span> <span class="n">CatBoostClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+
+<span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="n">PATH_MLFLOW_TRACKING</span><span class="p">,</span> <span class="n">PATH_PROJECT</span>
+
+
+<span class="n">Tracking</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;Tracking&quot;</span><span class="p">,</span>
+                      <span class="s2">&quot;run_name tags params metrics model model_name&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="new_experiment"><a class="viewcode-back" href="../../index.html#customer_segmentation.experiment_tracking.new_experiment">[docs]</a><span class="k">def</span> <span class="nf">new_experiment</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Creates an experiment in `PATH_MLFLOW_TRACKING` and</span>
+<span class="sd">    return the experiment id</span>
+
+<span class="sd">    If the experiment already exists, return its id</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">set_tracking_uri</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">PATH_MLFLOW_TRACKING</span><span class="p">))</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">create_experiment</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">MlflowException</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">get_experiment_by_name</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">experiment_id</span></div>
+
+
+<div class="viewcode-block" id="new_run"><a class="viewcode-back" href="../../index.html#customer_segmentation.experiment_tracking.new_run">[docs]</a><span class="k">def</span> <span class="nf">new_run</span><span class="p">(</span><span class="n">experiment_id</span><span class="p">,</span>
+            <span class="n">run_name</span><span class="p">,</span>
+            <span class="n">tags</span><span class="p">,</span>
+            <span class="n">params</span><span class="p">,</span>
+            <span class="n">metrics</span><span class="p">,</span>
+            <span class="n">model</span><span class="p">,</span>
+            <span class="n">model_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Creates a new run in the experiment with id `experiment_id`</span>
+<span class="sd">    and return the run id</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">(</span><span class="n">experiment_id</span><span class="o">=</span><span class="n">experiment_id</span><span class="p">,</span>
+                          <span class="n">run_name</span><span class="o">=</span><span class="n">run_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">set_tags</span><span class="p">(</span><span class="n">tags</span><span class="p">)</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_params</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metrics</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">sklearn</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">model_name</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">run</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">run_uuid</span></div>
+
+
+<div class="viewcode-block" id="apply_runs_to_experiment"><a class="viewcode-back" href="../../index.html#customer_segmentation.experiment_tracking.apply_runs_to_experiment">[docs]</a><span class="k">def</span> <span class="nf">apply_runs_to_experiment</span><span class="p">(</span><span class="n">experiment_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                             <span class="n">trackings</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tracking</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Giving an `experiment_id` and a list of trackings,</span>
+<span class="sd">    which defines each run of the experiment</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">new_run</span><span class="p">(</span><span class="n">experiment_id</span><span class="p">,</span>
+                    <span class="n">run_name</span><span class="o">=</span><span class="n">tracking</span><span class="o">.</span><span class="n">run_name</span><span class="p">,</span>
+                    <span class="n">tags</span><span class="o">=</span><span class="n">tracking</span><span class="o">.</span><span class="n">tags</span><span class="p">,</span>
+                    <span class="n">params</span><span class="o">=</span><span class="n">tracking</span><span class="o">.</span><span class="n">params</span><span class="p">,</span>
+                    <span class="n">metrics</span><span class="o">=</span><span class="n">tracking</span><span class="o">.</span><span class="n">metrics</span><span class="p">,</span>
+                    <span class="n">model</span><span class="o">=</span><span class="n">tracking</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+                    <span class="n">model_name</span><span class="o">=</span><span class="n">tracking</span><span class="o">.</span><span class="n">model_name</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">tracking</span> <span class="ow">in</span> <span class="n">trackings</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="n_best_models_from_experiments"><a class="viewcode-back" href="../../index.html#customer_segmentation.experiment_tracking.n_best_models_from_experiments">[docs]</a><span class="k">def</span> <span class="nf">n_best_models_from_experiments</span><span class="p">(</span><span class="n">experiment_ids</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+                                   <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                                   <span class="n">order_by</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Gets `n` best models from every runs in `experiments_ids`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">search_runs</span><span class="p">(</span><span class="n">experiment_ids</span><span class="p">,</span> <span class="n">max_results</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">order_by</span><span class="o">=</span><span class="n">order_by</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="load_trained_model"><a class="viewcode-back" href="../../index.html#customer_segmentation.experiment_tracking.load_trained_model">[docs]</a><span class="k">def</span> <span class="nf">load_trained_model</span><span class="p">(</span><span class="n">model_artifact_uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                       <span class="n">model_model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">CatBoostClassifier</span><span class="p">,</span>
+                                                       <span class="n">Pipeline</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Load trained model from `model_artifact_uri`</span>
+<span class="sd">    giving also its name `model_model_name` uri&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">sklearn</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">model_artifact_uri</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">model_model_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="load_best_model"><a class="viewcode-back" href="../../index.html#customer_segmentation.experiment_tracking.load_best_model">[docs]</a><span class="k">def</span> <span class="nf">load_best_model</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">CatBoostClassifier</span><span class="p">,</span> <span class="n">Pipeline</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Shortcut to get the best model applying</span>
+<span class="sd">    `load_trained_model`&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">load_trained_model</span><span class="p">(</span><span class="n">model_artifact_uri</span><span class="o">=</span><span class="n">PATH_PROJECT</span><span class="p">,</span>
+                              <span class="n">model_model_name</span><span class="o">=</span><span class="s1">&#39;best_model&#39;</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2020, Sergio Calderón Pérez-Lozao.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4 with <a href="https://github.com/schettino72/sphinx_press_theme">Press Theme</a>.
+</div>
+            </div>
+          </div>
+      </page>
+    </div>
+    
+    
+  </body>
+</html>

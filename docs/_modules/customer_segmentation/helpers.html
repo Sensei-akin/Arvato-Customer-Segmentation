@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html >
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+      <title>customer_segmentation.helpers</title>
+    
+      <link rel="stylesheet" href="../../_static/pygments.css">
+      <link rel="stylesheet" href="../../_static/theme.css">
+      <link rel="stylesheet" href="../../_static/sphinx_press_theme.css">
+      
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+
+      <!-- sphinx script_files -->
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+
+      
+      <script src="../../_static/theme-vendors.js"></script>
+      <script src="../../_static/theme.js" defer></script>
+    
+  <link rel="index" title="Index" href="../../genindex.html" />
+  <link rel="search" title="Search" href="../../search.html" /> 
+  </head>
+
+  <body>
+    <div id="app" class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <router-link to="../../index.html" class="home-link">
+    
+      <span class="site-name">Customer Segmentation</span>
+    
+  </router-link>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Quick search</span>
+    <div class="searchformwrapper">
+      <form class="search" action="../../search.html" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Search" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="../../index.html#arvato-customer-segmentation-docs">Contents</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 "><a href="../../index.html" class="reference internal ">Arvato Customer Segmentation Docs</a>
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+    
+      <li><a href="../index.html">Module code</a> &raquo;</li>
+    
+    <li>customer_segmentation.helpers</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main">
+            
+  <h1>Source code for customer_segmentation.helpers</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">from</span> <span class="nn">kaggle.api.kaggle_api_extended</span> <span class="kn">import</span> <span class="n">KaggleApi</span>
+<span class="kn">from</span> <span class="nn">joblib</span> <span class="kn">import</span> <span class="n">dump</span><span class="p">,</span> <span class="n">load</span>
+
+<span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="p">(</span><span class="n">PATH_DATA</span><span class="p">,</span>
+                        <span class="n">PATH_FILE_ATTRIBUTES</span><span class="p">,</span>
+                        <span class="n">PATH_SUBMISSIONS</span><span class="p">,</span>
+                        <span class="n">SEP</span><span class="p">,</span>
+                        <span class="n">NA_VALUES</span><span class="p">,</span>
+                        <span class="n">RANDOM_STATE</span><span class="p">,</span>
+                        <span class="n">PATH_OBJECTS</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="read_attributes"><a class="viewcode-back" href="../../index.html#customer_segmentation.helpers.read_attributes">[docs]</a><span class="k">def</span> <span class="nf">read_attributes</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Reads attributes file provided by Arvato</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df_attributes</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span>
+        <span class="n">PATH_FILE_ATTRIBUTES</span><span class="p">,</span>
+        <span class="n">header</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">usecols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Attribute&#39;</span><span class="p">,</span> <span class="s1">&#39;Description&#39;</span><span class="p">,</span> <span class="s1">&#39;Meaning&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="n">df_attributes</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">lower</span><span class="p">,</span> <span class="n">df_attributes</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df_attributes</span></div>
+
+
+<div class="viewcode-block" id="dtypes_from_attributes"><a class="viewcode-back" href="../../index.html#customer_segmentation.helpers.dtypes_from_attributes">[docs]</a><span class="k">def</span> <span class="nf">dtypes_from_attributes</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Builds dtype dictionary from dataframe `df` saving</span>
+<span class="sd">    a lot of memory with &#39;category&#39; approach vs &#39;object&#39; one</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df_copy</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;is_numeric&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;meaning&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;numeric value&#39;</span><span class="p">)</span>
+
+    <span class="n">dict_attributes</span> <span class="o">=</span> <span class="p">(</span><span class="n">df_copy</span><span class="p">[[</span><span class="s1">&#39;attribute&#39;</span><span class="p">,</span> <span class="s1">&#39;is_numeric&#39;</span><span class="p">]]</span>
+                       <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;attribute&#39;</span><span class="p">)</span>
+                       <span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+                       <span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;is_numeric&#39;</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="n">attribute</span><span class="p">:</span> <span class="nb">float</span> <span class="k">if</span> <span class="n">is_numeric</span> <span class="k">else</span> <span class="s1">&#39;category&#39;</span>
+            <span class="k">for</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">is_numeric</span> <span class="ow">in</span> <span class="n">dict_attributes</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span></div>
+
+
+<div class="viewcode-block" id="read_demographic_data"><a class="viewcode-back" href="../../index.html#customer_segmentation.helpers.read_demographic_data">[docs]</a><span class="k">def</span> <span class="nf">read_demographic_data</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                          <span class="n">sample_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Reads `sample_ratio` [0, 1] sample of demographic data from</span>
+<span class="sd">    `filename` located in `PATH_DATA` path</span>
+
+<span class="sd">    Uses correct dtypes for saving memory</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df_attributes</span> <span class="o">=</span> <span class="n">read_attributes</span><span class="p">()</span>
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">dtypes_from_attributes</span><span class="p">(</span><span class="n">df_attributes</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">skiprows_sample</span><span class="p">(</span><span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Inner function to read the data in a sampled way&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">index</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">sample_ratio</span>
+
+    <span class="c1"># RANDOM_STATE is necessary for easy reproducibility of sampled data</span>
+    <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">RANDOM_STATE</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">PATH_DATA</span> <span class="o">/</span> <span class="n">filename</span><span class="p">,</span>
+                       <span class="n">sep</span><span class="o">=</span><span class="n">SEP</span><span class="p">,</span>
+                       <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
+                       <span class="n">na_values</span><span class="o">=</span><span class="n">NA_VALUES</span><span class="p">,</span>
+                       <span class="n">skiprows</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">sample_ratio</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">skiprows_sample</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="constant_columns"><a class="viewcode-back" href="../../index.html#customer_segmentation.helpers.constant_columns">[docs]</a><span class="k">def</span> <span class="nf">constant_columns</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Gives the constants columns of `df` dataframe</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df_dropped_constants</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">(</span><span class="n">df</span> <span class="o">!=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">any</span><span class="p">()]</span>
+
+    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">df_dropped_constants</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="nullity_pct"><a class="viewcode-back" href="../../index.html#customer_segmentation.helpers.nullity_pct">[docs]</a><span class="k">def</span> <span class="nf">nullity_pct</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns the percentage of nulls for each column</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="kaggle_submission"><a class="viewcode-back" href="../../index.html#customer_segmentation.helpers.kaggle_submission">[docs]</a><span class="k">def</span> <span class="nf">kaggle_submission</span><span class="p">(</span><span class="n">column_lnr</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+                      <span class="n">y_pred</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span>
+                      <span class="n">submission_filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                      <span class="n">submission_message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Submits and saves submission data provided</span>
+<span class="sd">    in `column_lrt` and `y_pred`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">filepath</span> <span class="o">=</span> <span class="n">PATH_SUBMISSIONS</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">submission_filename</span><span class="si">}</span><span class="s1">.csv&#39;</span>
+    <span class="n">df_kaggle_submission</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">LNR</span><span class="o">=</span><span class="n">column_lnr</span><span class="p">,</span> <span class="n">RESPONSE</span><span class="o">=</span><span class="n">y_pred</span><span class="p">))</span>
+
+    <span class="n">df_kaggle_submission</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">kaggle_api</span> <span class="o">=</span> <span class="n">KaggleApi</span><span class="p">()</span>
+    <span class="n">kaggle_api</span><span class="o">.</span><span class="n">authenticate</span><span class="p">()</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">kaggle_api</span>
+          <span class="o">.</span><span class="n">competition_submit</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span>
+                              <span class="n">message</span><span class="o">=</span><span class="n">submission_message</span><span class="p">,</span>
+                              <span class="n">competition</span><span class="o">=</span><span class="s1">&#39;udacity-arvato-identify-customers&#39;</span><span class="p">)</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="serialize_object_dump"><a class="viewcode-back" href="../../index.html#customer_segmentation.helpers.serialize_object_dump">[docs]</a><span class="k">def</span> <span class="nf">serialize_object_dump</span><span class="p">(</span><span class="n">object_</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Dumps `object` in `PATH_OBJECTS / filename`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dump</span><span class="p">(</span><span class="n">object_</span><span class="p">,</span> <span class="n">PATH_OBJECTS</span> <span class="o">/</span> <span class="n">filename</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="serialize_object_load"><a class="viewcode-back" href="../../index.html#customer_segmentation.helpers.serialize_object_load">[docs]</a><span class="k">def</span> <span class="nf">serialize_object_load</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Loads serialized object in `PATH_OBJECTS / filename`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">load</span><span class="p">(</span><span class="n">PATH_OBJECTS</span> <span class="o">/</span> <span class="n">filename</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2020, Sergio Calderón Pérez-Lozao.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4 with <a href="https://github.com/schettino72/sphinx_press_theme">Press Theme</a>.
+</div>
+            </div>
+          </div>
+      </page>
+    </div>
+    
+    
+  </body>
+</html>

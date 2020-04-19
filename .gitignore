@@ -1,12 +1,14 @@
 .idea
 data
-reports
 notebooks/.ipynb_checkpoints
 notebooks/catboost_info
-notebooks/cb_model.json
 models
 submissions
 mlruns
 objects
 .pytest_cache
+docs/_build/
+docs/build
+reports
+notebooks/cb_model.json
 *.py[cod]
