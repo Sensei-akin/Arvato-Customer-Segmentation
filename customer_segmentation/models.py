@@ -79,12 +79,14 @@ def preprocessing_baseline(df: pd.DataFrame,
     X_filled = cat_features_fillna(X, cat_features=cat_features)
 
     try:
-        X_train, X_test_and_valid, y_train, y_test_and_valid = train_test_split(
-            X_filled,
-            y,
-            test_size=test_size + valid_size,
-            random_state=RANDOM_STATE,
-            stratify=y
+        X_train, X_test_and_valid, y_train, y_test_and_valid = (
+            train_test_split(
+                X_filled,
+                y,
+                test_size=test_size + valid_size,
+                random_state=RANDOM_STATE,
+                stratify=y
+            )
         )
 
         X_test, X_valid, y_test, y_valid = (
@@ -185,9 +187,9 @@ def target_stats_by_feature(df: pd.DataFrame,
 
     df_grouped = (
         df_copy
-            .groupby(feature)[target]
-            .agg(['mean', 'count'])
-            .reset_index()
+        .groupby(feature)[target]
+        .agg(['mean', 'count'])
+        .reset_index()
     )
 
     df_grouped.columns = [feature, f'{target}_mean', f'{target}_count']

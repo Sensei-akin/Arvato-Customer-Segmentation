@@ -4,7 +4,8 @@ import pandas as pd
 from sklearn.datasets import load_iris
 
 from customer_segmentation import preprocessing_baseline
-from customer_segmentation.models import DataSplitsUnitException, DataSplitsSizeException
+from customer_segmentation.models import (DataSplitsUnitException,
+                                          DataSplitsSizeException)
 
 TARGET = 'target'
 
@@ -53,36 +54,36 @@ def test_preprocessing_baseline_proportions():
                                                    test_size=0,
                                                    valid_size=0)
 
-    assert len(features_both_zero.X_train) == 150, 'Length of X_train is not correct'
-    assert len(features_both_zero.X_test) == 0, 'Length of X_test is not correct'
-    assert len(features_both_zero.X_valid) == 0, 'Length of X_valid is not correct'
+    assert len(features_both_zero.X_train) == 150
+    assert len(features_both_zero.X_test) == 0
+    assert len(features_both_zero.X_valid) == 0
 
     features_both_33, _ = preprocessing_baseline(df_iris,
                                                  cat_features=[],
                                                  target=TARGET,
-                                                 test_size=1/3,
-                                                 valid_size=1/3)
+                                                 test_size=1 / 3,
+                                                 valid_size=1 / 3)
 
-    assert len(features_both_33.X_train) == 50, 'Length of X_train is not correct'
-    assert len(features_both_33.X_test) == 50, 'Length of X_test is not correct'
-    assert len(features_both_33.X_valid) == 50, 'Length of X_valid is not correct'
+    assert len(features_both_33.X_train) == 50
+    assert len(features_both_33.X_test) == 50
+    assert len(features_both_33.X_valid) == 50
 
     features_test_33_valid_0, _ = preprocessing_baseline(df_iris,
                                                          cat_features=[],
                                                          target=TARGET,
-                                                         test_size=1/3,
+                                                         test_size=1 / 3,
                                                          valid_size=0)
 
-    assert len(features_test_33_valid_0.X_train) == 100, 'Length of X_train is not correct'
-    assert len(features_test_33_valid_0.X_test) == 50, 'Length of X_test is not correct'
-    assert len(features_test_33_valid_0.X_valid) == 0, 'Length of X_valid is not correct'
+    assert len(features_test_33_valid_0.X_train) == 100
+    assert len(features_test_33_valid_0.X_test) == 50
+    assert len(features_test_33_valid_0.X_valid) == 0
 
     features_valid_33_test_0, _ = preprocessing_baseline(df_iris,
                                                          cat_features=[],
                                                          target=TARGET,
                                                          test_size=0,
-                                                         valid_size=2/3)
+                                                         valid_size=2 / 3)
 
-    assert len(features_valid_33_test_0.X_train) == 50, f'Length of X_train is not correct'
-    assert len(features_valid_33_test_0.X_test) == 0, f'Length of X_test is not correct'
-    assert len(features_valid_33_test_0.X_valid) == 100, f'Length of X_valid is not correct'
+    assert len(features_valid_33_test_0.X_train) == 50
+    assert len(features_valid_33_test_0.X_test) == 0
+    assert len(features_valid_33_test_0.X_valid) == 100

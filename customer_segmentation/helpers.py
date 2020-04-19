@@ -102,8 +102,7 @@ def kaggle_submission(column_lnr: pd.Series,
     print(kaggle_api
           .competition_submit(filepath,
                               message=submission_message,
-                              competition='udacity-arvato-identify-customers')
-    )
+                              competition='udacity-arvato-identify-customers'))
 
 
 def serialize_object_dump(object_: Any, filename: str) -> None:

@@ -76,7 +76,9 @@ def load_trained_model(model_artifact_uri: str,
                                                        Pipeline]:
     """Load trained model from `model_artifact_uri`
     giving also its name `model_model_name` uri"""
-    return mlflow.sklearn.load_model(f'{model_artifact_uri}/{model_model_name}')
+    return (mlflow
+            .sklearn
+            .load_model(f'{model_artifact_uri}/{model_model_name}'))
 
 
 def load_best_model() -> Union[CatBoostClassifier, Pipeline]:

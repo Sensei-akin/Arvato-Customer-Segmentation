@@ -35,7 +35,7 @@ You can get a data profiling with `make profile` and a new folder **reports** wi
 
 The testing part is not important if you do not modify any part of the software in this repository, so it will not be so useful but you can also launch `make test` to pass all the checks.
 
-The last three shortcuts are for the generation of documentation and deliverables.
+The last three shortcuts are for the generation of deliverables and style guide enforcement.
 
 # Customer Segmentation Report
 

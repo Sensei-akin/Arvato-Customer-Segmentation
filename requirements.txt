@@ -7,7 +7,6 @@ pandas==0.25.3
 missingno==0.4.2
 kaggle==1.5.6
 plotly==4.6.0
-scikit_lego==0.4.1
 yellowbrick==1.1
 pytest==5.4.1
 eli5==0.10.1
@@ -16,6 +15,8 @@ imbalanced_learn==0.6.2
 imblearn==0.0
 mlflow==1.7.2
 scikit_learn==0.22.2.post1
-sklego==0.0
+pandas-profiling==2.5.0
 xgboost==1.0.2
 sphinx==2.4.4
+rst2pdf==0.96
+flake8==3.7.9
